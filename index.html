@@ -104,6 +104,13 @@
   .nav-group{position:relative;flex:none}
   .nav-item{background:none;border:none;color:#fff;font:inherit;font-size:.88rem;font-weight:600;padding:12px 15px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;border-radius:0}
   .nav-item:hover{background:rgba(255,255,255,.14)}
+  .nav-cta{margin:5px 6px 5px auto;align-self:center;display:inline-flex;align-items:center;gap:7px;
+    background:#EFC050;color:#5A0E1B;font-size:.82rem;font-weight:800;letter-spacing:.01em;
+    padding:8px 16px;border-radius:999px;text-decoration:none;white-space:nowrap;
+    box-shadow:0 2px 10px -2px rgba(0,0,0,.35);transition:transform .15s,box-shadow .15s,background .15s}
+  .nav-cta:hover{background:#F6D06A;transform:translateY(-1px);box-shadow:0 5px 14px -3px rgba(0,0,0,.45)}
+  .nav-cta:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .nav-cta svg{flex:none}
   .nav-item .caret{width:10px;height:10px;transition:transform .15s}
   .nav-group.open .nav-item .caret{transform:rotate(180deg)}
   .submenu{
@@ -812,7 +819,8 @@
       {label:"Granos", cat:"granos"},
       {label:"Sanidad", cat:"cuidado"},
       {label:"Harinas", cat:"harina"},
-      {label:"Nosotros", view:"about"}
+      {label:"Nosotros", view:"about"},
+      {label:"Venta por Mayor", cta:true}
     ];
     var CARET = '<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
 
@@ -831,6 +839,15 @@
     }
 
     NAV.forEach(function(n){
+      if(n.cta){
+        var a = document.createElement("a");
+        a.className = "nav-cta";
+        a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent("¡Hola La Barraquita! Me interesa comprar POR MAYOR. ¿Me pueden pasar la lista de precios mayoristas?");
+        a.target = "_blank"; a.rel = "noopener";
+        a.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>' + n.label;
+        navRow.appendChild(a);
+        return;
+      }
       if(!n.sub){
         var b = document.createElement("button");
         b.className = "nav-item"; b.type = "button"; b.textContent = n.label;
