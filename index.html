@@ -58,7 +58,7 @@
   }
   .top-row{display:flex;align-items:center;gap:18px;padding:16px 0}
   .brandmark{display:flex;align-items:center;text-decoration:none}
-  .brand-logo{height:170px;width:auto;max-width:100%;display:block;margin:-30px 0}
+  .brand-logo{--logo-h:clamp(58px,16vw,170px);height:var(--logo-h);width:auto;max-width:100%;display:block;margin:calc(var(--logo-h) * -0.17) 0}
   .brand-name{
     font-size:1.42rem;letter-spacing:.06em;color:var(--ink);
     display:flex;align-items:center;gap:10px;line-height:1;
@@ -283,7 +283,6 @@
     .bar{font-size:.7rem;padding:6px 12px}
     .top-row{padding:13px 0}
     .brand-name{font-size:1.22rem}
-    .brand-logo{height:64px;margin:-8px 0}
     .carousel{aspect-ratio:4/5;max-height:none}
     .slide{flex-basis:100%}
     .car-nav{width:36px;height:36px}
