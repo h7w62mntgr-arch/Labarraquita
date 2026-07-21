@@ -7,11 +7,8 @@
     "img/WhatsApp Image 2026-07-13 at 3.33.50 PM.jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.33.51 PM.jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.33.59 PM (1).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.33.59 PM (2).jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.33.59 PM (3).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.33.59 PM.jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.34.00 PM (1).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.00 PM (2).jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.34.00 PM (3).jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.34.00 PM.jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.34.01 PM (1).jpeg",
@@ -520,6 +517,10 @@
     if(!slidesList.length) return;
     slidesList.forEach(function(src, i){
       var s = document.createElement("div"); s.className = "slide";
+      // Fondo difuminado con la misma foto para rellenar las bandas (imágenes que no son 4:5).
+      // URL absoluta: el var() se consume en el CSS (carpeta css/), una ruta relativa se resolvería mal.
+      var bgUrl = new URL(src, document.baseURI).href;
+      s.style.setProperty("--bg", 'url("' + bgUrl.replace(/"/g, "%22") + '")');
       var im = document.createElement("img");
       im.src = src; im.alt = "Oferta " + (i + 1); im.loading = i < 3 ? "eager" : "lazy";
       s.appendChild(im); track.appendChild(s);

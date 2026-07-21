@@ -8,6 +8,7 @@
     --bordo:#6E1423;
     --bordo-deep:#570F1B;
     --bordo-tint:#F7EEF0;
+    --rojo-vivo:#E11021;
     --wa:#1FA855;
     --wa-deep:#17853F;
     --shadow:0 1px 2px rgba(20,17,18,.05),0 10px 24px -14px rgba(20,17,18,.14);
@@ -133,8 +134,10 @@
   .hero{padding:0}
   .carousel{position:relative;width:100%;aspect-ratio:12/5;max-height:88vh;background:var(--surface);overflow:hidden}
   .slides{display:flex;height:100%;transition:transform .5s ease}
-  .slide{flex:0 0 33.3333%;height:100%}
-  .slide img{width:100%;height:100%;object-fit:contain;display:block}
+  .slide{flex:0 0 33.3333%;height:100%;position:relative;overflow:hidden}
+  /* Relleno difuminado con la misma foto (evita bandas vacías en fotos que no son 4:5) */
+  .slide::before{content:"";position:absolute;inset:0;background:var(--bg) center/cover no-repeat;filter:blur(22px) brightness(.92);transform:scale(1.18);z-index:0}
+  .slide img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;display:block}
   .car-nav{
     position:absolute;top:50%;translate:0 -50%;z-index:3;
     width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;
@@ -155,7 +158,8 @@
     display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;justify-content:space-between;
   }
   .trust-lead{font-size:1.12rem;text-transform:uppercase;letter-spacing:.01em}
-  .trust-lead .rojo{color:var(--bordo)}
+  .trust-lead .rojo{color:var(--rojo-vivo)}
+  .rojo{color:var(--rojo-vivo)}
   .trust-items{display:flex;flex-wrap:wrap;gap:8px 22px}
   .ti{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--ink-soft);font-weight:600}
   .ti svg{color:var(--bordo);flex:none}
