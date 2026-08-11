@@ -2,21 +2,50 @@
   "use strict";
   // ⚠ Número de demo: reemplazar por el WhatsApp real del negocio.
   var WA = "59892109806";
-  var SLIDES = [
-    "img/WhatsApp Image 2026-07-13 at 3.33.50 PM (1).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.33.50 PM.jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.33.51 PM.jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.33.59 PM (1).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.33.59 PM (3).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.00 PM (1).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.00 PM (3).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.00 PM.jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.01 PM (1).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.01 PM (2).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.01 PM (3).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.01 PM (4).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.01 PM.jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.02 PM.jpeg"
+  /* ── Ofertas del mes ──
+     Cada oferta es un slide del carrusel y se toca para pedirla por WhatsApp.
+     Para cambiar las promos del mes: reemplazar las imágenes (4:5) y el texto de "msg". */
+  var OFERTAS = [
+    {
+      img: "img/ofertas/criolla-combo-xl-35kg.jpg",
+      alt: "Volvió el combo XL de Criolla: 25 kg + 10 kg = 35 kg a $ 1550",
+      msg: "Combo XL de Criolla para perros adultos — 25 kg + 10 kg (35 kg) por $ 1550"
+    },
+    {
+      img: "img/ofertas/combo-connie-22-8.jpg",
+      alt: "Combo Connie para perros adultos: 22 kg + 8 kg a $ 1880",
+      msg: "Combo Connie perros adultos — 22 kg + 8 kg por $ 1880"
+    },
+    {
+      img: "img/ofertas/astro-selection-14-3.jpg",
+      alt: "Astro Selection para perros adultos: 14 kg + 3 kg a $ 2135",
+      msg: "Astro Selection perros adultos — 14 kg + 3 kg por $ 2135"
+    },
+    {
+      img: "img/ofertas/gran-plus-cordero-colchoneta.jpg",
+      alt: "Gran Plus saborizada de cordero: 15 kg + 1,5 kg y colchoneta de regalo",
+      msg: "Gran Plus Gourmet saborizada de cordero — 15 kg + 1,5 kg con colchoneta de regalo"
+    },
+    {
+      img: "img/ofertas/le-roy-gatos-1250.jpg",
+      alt: "Le Roy Premium para gatos adultos, 10,1 kg: ofertón $ 1250",
+      msg: "Le Roy Premium Cocktail do Mar gatos adultos — 10,1 kg por $ 1250"
+    },
+    {
+      img: "img/ofertas/criolla-gatos-pack-xl.jpg",
+      alt: "Pack XL de Criolla para gatos: pagás 7 kg y te llevás 10 kg a $ 620",
+      msg: "Pack XL de Criolla para gatos — pagás 7 kg y te llevás 10 kg por $ 620"
+    },
+    {
+      img: "img/ofertas/astro-selection-beneficios.jpg",
+      alt: "Astro Selection: 23 % de proteína, salud oral, piel y pelaje saludables",
+      msg: "Astro Selection perros adultos — 14 kg + 3 kg"
+    },
+    {
+      img: "img/ofertas/100-nutricion.jpg",
+      alt: "100 % nutrición para tu mascota: hacé tu pedido",
+      msg: null
+    }
   ];
 
   var ICONS = {
@@ -57,6 +86,13 @@
   }
   function waLink(p){
     var msg = "Hola La Barraquita! Quiero pedir: " + p.name + " (" + p.pres + "). ¿Está disponible?";
+    return "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
+  }
+  /* Link de WhatsApp de una oferta del carrusel (las piezas sin producto puntual llevan mensaje genérico) */
+  function waOferta(o){
+    var msg = o.msg
+      ? "Hola La Barraquita! Quiero pedir la oferta: " + o.msg + ". ¿Está disponible?"
+      : "Hola La Barraquita! Vengo desde la web y quiero hacer un pedido. ¿Me ayudan?";
     return "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
   }
 
@@ -513,16 +549,20 @@
     var track = document.getElementById("slides");
     var dotsWrap = document.getElementById("dots");
     if(!track) return;
-    var slidesList = SLIDES.filter(function(v,i,a){ return a.indexOf(v) === i; });
+    var slidesList = OFERTAS;
     if(!slidesList.length) return;
-    slidesList.forEach(function(src, i){
-      var s = document.createElement("div"); s.className = "slide";
+    slidesList.forEach(function(o, i){
+      // Cada oferta es un link: al tocar la foto se abre WhatsApp con el mensaje de esa compra.
+      var s = document.createElement("a"); s.className = "slide";
+      s.href = waOferta(o);
+      s.target = "_blank"; s.rel = "noopener";
+      s.setAttribute("aria-label", "Pedir por WhatsApp: " + o.alt);
       // Fondo difuminado con la misma foto para rellenar las bandas (imágenes que no son 4:5).
       // URL absoluta: el var() se consume en el CSS (carpeta css/), una ruta relativa se resolvería mal.
-      var bgUrl = new URL(src, document.baseURI).href;
+      var bgUrl = new URL(o.img, document.baseURI).href;
       s.style.setProperty("--bg", 'url("' + bgUrl.replace(/"/g, "%22") + '")');
       var im = document.createElement("img");
-      im.src = src; im.alt = "Oferta " + (i + 1); im.loading = i < 3 ? "eager" : "lazy";
+      im.src = o.img; im.alt = o.alt; im.loading = i < 3 ? "eager" : "lazy";
       s.appendChild(im); track.appendChild(s);
     });
     var N = slidesList.length, page = 0, timer = null;
@@ -560,14 +600,19 @@
     var car = document.getElementById("carousel");
     car.addEventListener("mouseenter", function(){ clearInterval(timer); });
     car.addEventListener("mouseleave", reset);
-    var x0 = null;
-    car.addEventListener("pointerdown", function(e){ x0 = e.clientX; });
+    var x0 = null, dragged = false;
+    car.addEventListener("pointerdown", function(e){ x0 = e.clientX; dragged = false; });
     car.addEventListener("pointerup", function(e){
       if(x0 === null) return;
       var dx = e.clientX - x0;
+      dragged = Math.abs(dx) > 8;               // arrastró: no es un clic para abrir WhatsApp
       if(Math.abs(dx) > 40){ dx < 0 ? next() : prev(); reset(); }
       x0 = null;
     });
+    /* Si el gesto fue un swipe, no abrimos el link de la oferta */
+    car.addEventListener("click", function(e){
+      if(dragged){ e.preventDefault(); e.stopPropagation(); dragged = false; }
+    }, true);
     var rt;
     window.addEventListener("resize", function(){
       clearTimeout(rt);
