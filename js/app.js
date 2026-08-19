@@ -13,7 +13,8 @@
     "img/WhatsApp Image 2026-07-13 at 3.34.00 PM.jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.34.01 PM (1).jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.34.01 PM (2).jpeg",
-    "img/WhatsApp Image 2026-07-13 at 3.34.01 PM (3).jpeg",
+    /* "3.34.01 PM (3)" (camión "Envíos en el Día") es apaisada 2:1: no entra en el
+       recuadro 4:5 del carrusel. Va como banda ancha propia en index.html. */
     "img/WhatsApp Image 2026-07-13 at 3.34.01 PM (4).jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.34.01 PM.jpeg",
     "img/WhatsApp Image 2026-07-13 at 3.34.02 PM.jpeg"
@@ -26,6 +27,20 @@
     granos: '<svg width="52" height="52" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6v34"/><path d="M24 14c-3-3-7-3-9-2 1 3 4 6 9 6m0-4c3-3 7-3 9-2-1 3-4 6-9 6m0 4c-3-3-7-3-9-2 1 3 4 6 9 6m0-4c3-3 7-3 9-2-1 3-4 6-9 6"/></svg>',
     cuidado:'<svg width="52" height="52" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6l13 5v8c0 8-5.5 15-13 18-7.5-3-13-10-13-18v-8z"/><path d="M24 17v10M19 22h10"/></svg>',
     harina: '<svg width="52" height="52" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14h20l-2 26H16z"/><path d="M14 14l3-6h14l3 6"/><path d="M20 22h8M19 30h10"/></svg>'
+  };
+
+  /* Iconos chicos para las pestañas de categoría */
+  function ti(paths){
+    return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+      paths.map(function(d){ return '<path d="' + d + '"/>'; }).join("") + '</svg>';
+  }
+  var TAB_ICONS = {
+    perro:   ti(["M10 5.2 8 4C6 4 4.5 5.5 4 8l1 6-1 4h3l1-3h6l1 3h3l-1-6c.5-3-1-6-4-7l-2 1.2a3 3 0 0 1-2 0Z"]),
+    gato:    ti(["M4 20v-7l-2-6 4 3h8l4-3-2 6v7","M8 15h.01","M14 15h.01"]),
+    granja:  ti(["M3 21V10l9-6 9 6v11","M9 21v-6h6v6"]),
+    granos:  ti(["M12 3v18","M12 7c-3-1-5-3-5-3s0 4 5 4Z","M12 7c3-1 5-3 5-3s0 4-5 4Z","M12 13c-3-1-5-3-5-3s0 4 5 4Z","M12 13c3-1 5-3 5-3s0 4-5 4Z"]),
+    cuidado: ti(["M12 21s-7-4.3-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.7-7 10-7 10Z","M12 8v6","M9 11h6"]),
+    harina:  ti(["M6 3h12l-1 4H7Z","M7 7l-2 14h14L17 7"])
   };
 
   var CATS = [
@@ -88,7 +103,7 @@
   function cartTotals(){ var t={UYU:0,USD:0}; for(var k in cart){ var p=byId[k]; if(p.price!==null&&p.price!==undefined){ t[p.cur]+=cart[k]*p.price; } } return t; }
   function totalsText(){ var t=cartTotals(), a=[]; if(t.UYU>0) a.push(fmt(t.UYU)); if(t.USD>0) a.push(fmtUSD(t.USD)); return a.length?a.join(" + "):"Consultar"; }
 
-  var state = { cat:"todos", q:"", sub:null, subLabel:"", sort:"default" };
+  var state = { cat:"todos", q:"", sub:null, subLabel:"", sort:"default", page:0 };
 
   function sortVal(p){
     if(p.price === null || p.price === undefined) return Infinity;
@@ -117,19 +132,45 @@
   var empty = document.getElementById("empty");
   var count = document.getElementById("count");
   var title = document.getElementById("cat-title");
-  var moreWrap = document.getElementById("moreWrap");
-  var btnMore = document.getElementById("btnMore");
+  var pager = document.getElementById("pager");
 
-  /* Cuántos productos se muestran de entrada y cuánto suma cada "Ver más" */
+  /* Productos por página y cuántos números se ven en la paginación */
   var PAGE_SIZE = 12;
-  var shown = PAGE_SIZE;
+  /* En el celular entran menos números en una línea */
+  function pageWindow(){ return window.matchMedia("(max-width:600px)").matches ? 3 : 5; }
 
   function norm(s){
     return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   }
 
-  function render(keepShown){
-    if(!keepShown) shown = PAGE_SIZE;
+  /* Paginaci\u00f3n numerada: \u2039 1 2 3 \u2026 \u203a con ventana m\u00f3vil de PAGE_WINDOW n\u00fameros */
+  function renderPager(page, pageCount){
+    if(pageCount <= 1){ pager.hidden = true; pager.innerHTML = ""; return; }
+    pager.hidden = false;
+    var win = pageWindow();
+    var start = Math.max(0, Math.min(page - Math.floor(win / 2), pageCount - win));
+    var end = Math.min(pageCount, start + win);
+    var html = '<button class="pg-arrow" type="button" data-page="' + (page - 1) + '"' +
+      (page === 0 ? ' disabled' : '') + ' aria-label="P\u00e1gina anterior">\u2039</button>';
+    if(start > 0){
+      html += '<button class="pg-num" type="button" data-page="0" aria-label="P\u00e1gina 1">1</button>';
+      if(start > 1) html += '<span class="pg-gap">\u2026</span>';
+    }
+    for(var n = start; n < end; n++){
+      html += '<button class="pg-num' + (n === page ? ' active' : '') + '" type="button" data-page="' + n + '"' +
+        (n === page ? ' aria-current="page"' : '') + ' aria-label="P\u00e1gina ' + (n + 1) + '">' + (n + 1) + '</button>';
+    }
+    if(end < pageCount){
+      if(end < pageCount - 1) html += '<span class="pg-gap">\u2026</span>';
+      html += '<button class="pg-num" type="button" data-page="' + (pageCount - 1) + '" aria-label="P\u00e1gina ' + pageCount + '">' + pageCount + '</button>';
+    }
+    html += '<button class="pg-arrow" type="button" data-page="' + (page + 1) + '"' +
+      (page === pageCount - 1 ? ' disabled' : '') + ' aria-label="P\u00e1gina siguiente">\u203a</button>';
+    pager.innerHTML = html;
+  }
+
+  function render(keepPage){
+    if(!keepPage) state.page = 0;
     var q = norm(state.q.trim());
     var items = PRODUCTS.filter(function(p){
       if(state.cat !== "todos" && p.cat !== state.cat) return false;
@@ -142,19 +183,17 @@
       return norm(p.name + " " + p.pres + " " + catLabel[p.cat]).indexOf(q) !== -1;
     });
     items = sortItems(items);
-    var baseTitle = state.cat === "todos" ? "Catálogo" : catLabel[state.cat];
+    var baseTitle = state.cat === "todos" ? "Productos" : catLabel[state.cat];
     title.textContent = state.subLabel ? baseTitle + " · " + state.subLabel : baseTitle;
     count.textContent = items.length + (items.length === 1 ? " producto" : " productos");
     empty.classList.toggle("show", items.length === 0);
 
-    var visible = items.slice(0, shown);
-    var restantes = items.length - visible.length;
-    if(restantes > 0){
-      btnMore.textContent = "Ver más (" + restantes + ")";
-      moreWrap.hidden = false;
-    } else {
-      moreWrap.hidden = true;
-    }
+    var pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+    if(state.page > pageCount - 1) state.page = pageCount - 1;
+    if(state.page < 0) state.page = 0;
+    var page = state.page;
+    var visible = items.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+    renderPager(page, pageCount);
 
     grid.innerHTML = visible.map(function(p){
       var name = esc(p.name);
@@ -177,18 +216,34 @@
     }).join("");
   }
 
-  var catSelect = document.getElementById("cat");
+  /* ── Pestañas de categoría ── */
+  var tabsWrap = document.getElementById("cattabs");
+  var catCount = {};
+  PRODUCTS.forEach(function(p){ catCount[p.cat] = (catCount[p.cat] || 0) + 1; });
+  catCount.todos = PRODUCTS.length;
+
+  function syncTabs(cat){
+    var bs = tabsWrap.querySelectorAll(".ctab");
+    for(var i = 0; i < bs.length; i++){
+      var on = bs[i].getAttribute("data-cat") === cat;
+      bs[i].classList.toggle("active", on);
+      bs[i].setAttribute("aria-selected", on ? "true" : "false");
+    }
+  }
   CATS.forEach(function(c){
-    var o = document.createElement("option");
-    o.value = c.id;
-    o.textContent = c.id === "todos" ? "Todas las categorías" : c.label;
-    catSelect.appendChild(o);
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "ctab"; b.setAttribute("data-cat", c.id);
+    b.setAttribute("role", "tab");
+    b.innerHTML = (TAB_ICONS[c.id] || "") + c.label + '<span class="n">' + (catCount[c.id] || 0) + '</span>';
+    b.addEventListener("click", function(){
+      state.cat = c.id;
+      state.sub = null; state.subLabel = "";
+      syncTabs(c.id);
+      render();
+    });
+    tabsWrap.appendChild(b);
   });
-  catSelect.addEventListener("change", function(){
-    state.cat = catSelect.value;
-    state.sub = null; state.subLabel = "";
-    render();
-  });
+  syncTabs(state.cat);
 
   document.getElementById("sort").addEventListener("change", function(e){
     state.sort = e.target.value;
@@ -200,9 +255,18 @@
     render();
   });
 
-  btnMore.addEventListener("click", function(){
-    shown += PAGE_SIZE;
-    render(true);          // true = no reiniciar el conteo visible
+  /* Ir a una página del catálogo y volver al principio de la grilla */
+  function goPage(n){
+    state.page = n;
+    render(true);          // true = no reiniciar la página
+    var c = document.getElementById("catalogo");
+    if(c) c.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  pager.addEventListener("click", function(e){
+    var b = e.target.closest("[data-page]");
+    if(!b || b.disabled) return;
+    goPage(parseInt(b.getAttribute("data-page"), 10));
   });
 
   /* ── Barra de categorías con submenús ── */
@@ -254,7 +318,7 @@
     function applyNav(cat, sub, subLabel){
       if(aboutEl && !aboutEl.hidden){ showHome(); clearHash(); }
       state.cat = cat; state.sub = sub || null; state.subLabel = subLabel || "";
-      catSelect.value = cat;
+      syncTabs(cat);
       closeMenus();
       closeNavMenu();
       render();
@@ -269,7 +333,7 @@
         a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent("¡Hola La Barraquita! Me interesa comprar POR MAYOR. ¿Me pueden pasar la lista de precios mayoristas?");
         a.target = "_blank"; a.rel = "noopener";
         a.addEventListener("click", closeNavMenu);
-        a.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>' + n.label;
+        a.textContent = n.label;
         navRow.appendChild(a);
         return;
       }
@@ -295,7 +359,7 @@
       top.innerHTML = n.label + " " + CARET;
       top.addEventListener("click", function(e){
         e.stopPropagation();
-        if(window.matchMedia("(max-width:820px)").matches){
+        if(window.matchMedia("(max-width:860px)").matches){
           var wasOpen = g.classList.contains("open");
           closeMenus();
           if(!wasOpen) g.classList.add("open");
@@ -319,6 +383,16 @@
       g.appendChild(menu);
       navRow.appendChild(g);
     });
+
+    /* Enlaces de categoría del pie: filtran el catálogo igual que la barra de arriba */
+    var footCats = document.querySelectorAll("[data-foot-cat]");
+    for(var fi = 0; fi < footCats.length; fi++){
+      (function(btn){
+        btn.addEventListener("click", function(){
+          applyNav(btn.getAttribute("data-foot-cat"), null, "");
+        });
+      })(footCats[fi]);
+    }
 
     function closeNavMenu(){
       var t = document.getElementById("navToggle"), m = document.getElementById("mainnav");
@@ -352,8 +426,14 @@
   document.getElementById("foot-wa").href =
     "https://wa.me/" + WA + "?text=" + encodeURIComponent("Hola La Barraquita! Quiero hacer una consulta sobre el catálogo.");
 
+  var footYear = document.getElementById("footYear");
+  if(footYear) footYear.textContent = new Date().getFullYear();
+
+  document.getElementById("btnMayor").href =
+    "https://wa.me/" + WA + "?text=" + encodeURIComponent("¡Hola La Barraquita! Me interesa comprar POR MAYOR. ¿Me pueden pasar la lista de precios mayoristas?");
+
   /* ── Elementos del carrito y la ficha ── */
-  var fab = document.getElementById("cartFab");
+  var fab = document.getElementById("cartBtn");
   var fabCount = document.getElementById("cartCount");
   var modalOverlay = document.getElementById("modalOverlay");
   var modalBody = document.getElementById("modalBody");
@@ -381,7 +461,7 @@
   function updateCart(){
     var n = cartCount();
     fabCount.textContent = n;
-    fab.hidden = n === 0;
+    fab.classList.toggle("has", n > 0);
     renderDrawer();
   }
   function addToCart(id, qty){ cart[id] = (cart[id] || 0) + (qty || 1); updateCart(); }
@@ -505,6 +585,12 @@
     if(e.key === "Enter" && e.target.classList.contains("card")){ openModal(e.target.getAttribute("data-id")); }
   });
 
+  var pagerRt;
+  window.addEventListener("resize", function(){
+    clearTimeout(pagerRt);
+    pagerRt = setTimeout(function(){ render(true); }, 200);
+  });
+
   updateCart();
   render();
 
@@ -517,18 +603,19 @@
     if(!slidesList.length) return;
     slidesList.forEach(function(src, i){
       var s = document.createElement("div"); s.className = "slide";
+      var inner = document.createElement("div"); inner.className = "slide-in";
       // Fondo difuminado con la misma foto para rellenar las bandas (imágenes que no son 4:5).
       // URL absoluta: el var() se consume en el CSS (carpeta css/), una ruta relativa se resolvería mal.
       var bgUrl = new URL(src, document.baseURI).href;
-      s.style.setProperty("--bg", 'url("' + bgUrl.replace(/"/g, "%22") + '")');
+      inner.style.setProperty("--bg", 'url("' + bgUrl.replace(/"/g, "%22") + '")');
       var im = document.createElement("img");
       im.src = src; im.alt = "Oferta " + (i + 1); im.loading = i < 3 ? "eager" : "lazy";
-      s.appendChild(im); track.appendChild(s);
+      inner.appendChild(im); s.appendChild(inner); track.appendChild(s);
     });
     var N = slidesList.length, page = 0, timer = null;
     function perView(){
       if(window.matchMedia("(max-width:600px)").matches) return 1;
-      if(window.matchMedia("(max-width:820px)").matches) return 2;
+      if(window.matchMedia("(max-width:860px)").matches) return 2;
       return 3;
     }
     function pages(){ return Math.ceil(N / perView()); }
