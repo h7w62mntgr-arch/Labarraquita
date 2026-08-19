@@ -155,6 +155,14 @@ header.top{
 .carousel{position:relative;width:100%;overflow:hidden;touch-action:pan-y}
 .slides{display:flex;transition:transform .55s cubic-bezier(.65,.05,.36,1)}
 .slide{flex:0 0 33.3333%;padding:0 9px}
+/* Cada oferta es un link: al tocarla se abre WhatsApp con el mensaje de esa compra */
+a.slide{display:block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+@media (hover:hover){
+  a.slide:hover .slide-in img{transform:scale(1.03)}
+  a.slide:hover .slide-in{box-shadow:0 18px 36px -20px rgba(92,27,38,.6)}
+}
+a.slide:focus-visible{outline:none}
+a.slide:focus-visible .slide-in{outline:3px solid var(--wa);outline-offset:-3px}
 /* El alto sale del propio recuadro: 4:5 exacto, igual que las fotos de oferta.
    Así encastran sin bandas. Las que no son 4:5 se rellenan con el fondo difuminado. */
 .slide-in{
@@ -163,10 +171,19 @@ header.top{
 }
 /* Relleno difuminado con la misma foto (evita bandas vacías en fotos que no son 4:5) */
 .slide-in::before{content:"";position:absolute;inset:0;background:var(--bg) center/cover no-repeat;filter:blur(22px) brightness(.92);transform:scale(1.18);z-index:0}
-.slide-in img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;display:block}
+.slide-in img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;display:block;transition:transform .35s ease}
 .dots{display:flex;gap:9px;justify-content:center;margin-top:16px}
 .dot{width:9px;height:9px;padding:0;border:none;border-radius:9px;background:#D8CBB6;transition:width .35s,background .35s}
 .dot.active{width:26px;background:var(--gold)}
+/* Aviso de que la foto se toca para pedir */
+.car-hint{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  margin:16px auto 0;width:max-content;max-width:100%;
+  padding:9px 18px;border-radius:999px;
+  background:#fff;border:1px solid var(--line-2);
+  font-size:.84rem;font-weight:600;color:var(--body);
+}
+.car-hint svg{flex:none;color:var(--wa)}
 
 /* ── Barra de confianza ── */
 .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--cream)}
@@ -540,6 +557,8 @@ footer{margin-top:72px;background:var(--ink);color:#BFB3A6;border-top:3px solid 
   /* el alto lo define .slide-in (4:5) */
   .slide{flex-basis:100%;padding:0 5px}
   .car-nav{width:38px;height:38px}
+  .car-hint{font-size:.76rem;gap:7px;padding:8px 14px;margin-top:14px}
+  .car-hint svg{width:14px;height:14px}
   .trust-row{padding:13px 16px;gap:8px 16px}
   .trust-lead{font-size:1.05rem;flex-basis:100%}
   .ti{font-size:.8rem}
