@@ -1,0 +1,21 @@
+# Archivos que NO forman parte del sitio publicado.
+# Mismo formato que .gitignore, pero solo afecta al deploy de Cloudflare.
+
+# Control de versiones y herramientas (el packfile de .git rompia el build:
+# 44.5 MiB, sobre el limite de 25 MiB por archivo)
+.git
+.gitignore
+.assetsignore
+.claude
+.claude-dev-helper
+.wrangler
+node_modules
+wrangler.jsonc
+
+# Masters de fotos del cliente: quedan en el repo para poder regenerar
+# img/web, pero no se publican (44 MB muertos en cada deploy).
+img/*
+!img/web/
+!img/ofertas/
+!img/brand-logo.png
+!img/caret.svg
