@@ -1,0 +1,5 @@
+# La Barraquita — https://labarraquita.com.uy/
+User-agent: *
+Allow: /
+
+Sitemap: https://labarraquita.com.uy/sitemap.xml
