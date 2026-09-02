@@ -98,7 +98,15 @@
       "url": "https://labarraquita.com.uy/",
       "name": "La Barraquita",
       "inLanguage": "es-UY",
-      "publisher": { "@id": "https://labarraquita.com.uy/#negocio" }
+      "publisher": { "@id": "https://labarraquita.com.uy/#negocio" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://labarraquita.com.uy/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
     }
   ]
 }
@@ -284,6 +292,8 @@
         <li><a href="/catalogo/sanidad/" data-foot-cat="cuidado">Sanidad</a></li>
         <li><a href="/catalogo/harinas/" data-foot-cat="harina">Harinas</a></li>
         <li><a href="/catalogo/" class="foot-all">Todos los productos con precio →</a></li>
+        <li><a href="/guias/">Guías y consejos</a></li>
+        <li><a href="/preguntas-frecuentes/">Preguntas frecuentes</a></li>
       </ul>
     </div>
 

@@ -294,6 +294,11 @@
     state.q = e.target.value;
     render();
   });
+  /* Búsqueda por URL (?q=astro): la usa el SearchAction de Google y sirve para compartir búsquedas */
+  try{
+    var q0 = new URLSearchParams(location.search).get("q");
+    if(q0){ document.getElementById("q").value = q0; state.q = q0; }
+  }catch(e){}
 
   /* Ir a una página del catálogo y volver al principio de la grilla */
   function goPage(n){

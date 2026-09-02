@@ -15,6 +15,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import DESCRIPCIONES from "./descripciones.mjs";
+import FAQ from "./faq.mjs";
+import GUIAS from "./guias.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://labarraquita.com.uy";
@@ -50,21 +52,36 @@ const CATS = {
 
 /* Marcas que valen una página propia (se generan solo si tienen 2+ productos) */
 const MARCAS = [
-  { nombre:"Astro",         re:/^astro\b/i },
-  { nombre:"Bravo",         re:/^bravo\b/i },
-  { nombre:"Frost",         re:/^frost\b/i },
-  { nombre:"Criolla",       re:/^criolla\b/i },
-  { nombre:"Connie",        re:/^connie\b/i },
-  { nombre:"Equilibrio",    re:/^equilibrio\b/i },
-  { nombre:"Le Roy",        re:/^le roy\b/i },
-  { nombre:"Prot",          re:/^prot\b/i },
-  { nombre:"Fámil Premium", re:/^f[áa]mil\b/i },
-  { nombre:"Atacama",       re:/^atacama\b/i },
-  { nombre:"Nhock",         re:/^nhock\b/i },
-  { nombre:"Oriunda",       re:/^oriunda\b/i },
-  { nombre:"Hiport Dog",    re:/^hiport\b/i },
-  { nombre:"Macanudo",      re:/^macanudo\b/i },
-  { nombre:"Simparica",     re:/^simparica\b/i }
+  { nombre:"Astro", re:/^astro\b/i,
+    desc:"Astro es la línea premium especial de Supra: raciones con proteína de alta calidad, cuidado de piel y pelaje y salud oral. Tiene fórmulas específicas para adultos, razas pequeñas y perros senior mayores de 7 años, con croqueta adaptada a cada etapa. Es una de las marcas que más recomendamos cuando se busca calidad sin irse a lo más caro del mercado." },
+  { nombre:"Bravo", re:/^bravo\b/i,
+    desc:"Bravo es una ración de muy buena relación precio–calidad con línea completa: Original para adultos, Baby para cachorros, Light para control de peso y Razas Pequeñas con croqueta chica. La mayoría de sus presentaciones vienen con kilos de regalo, lo que la hace muy conveniente para casas con más de un perro." },
+  { nombre:"Frost", re:/^frost\b/i,
+    desc:"Frost es una ración premium con fórmulas por etapa y tamaño: cachorros, razas pequeñas, razas grandes, light y una línea para gatos castrados. Se destaca por la digestibilidad, el cuidado articular en razas grandes y el control de calorías en las versiones light." },
+  { nombre:"Criolla", re:/^criolla\b/i,
+    desc:"Criolla es la ración económica más vendida del mostrador: alimento completo para perros adultos, cachorros y gatos a un precio muy accesible. Sus combos XL (25 kg + 7 kg en perros, 7 kg que rinden 10 kg en gatos) son la opción más rendidora del catálogo." },
+  { nombre:"Connie", re:/^connie\b/i,
+    desc:"Connie es una marca uruguaya de raciones para perros y gatos adultos, con buena aceptación y precio justo, en presentaciones de 8, 9 y 25 kg. También fabrica una piedra sanitaria económica para la bandeja de todos los días." },
+  { nombre:"Equilibrio", re:/^equilibrio\b/i,
+    desc:"Equilibrio es una ración super premium de Total Alimentos, con proteínas de alta calidad, prebióticos para la digestión y cuidado dental. Tiene fórmulas para razas pequeñas, razas medianas y gatos adultos. Al ser más concentrada, el perro come menos gramos por día." },
+  { nombre:"Le Roy", re:/^le roy\b/i,
+    desc:"Le Roy Premium es una ración para gatos adultos con sabores de alta aceptación, como pescado (Cocktail do Mar) y carne, en bolsas de 10,1 kg. Buena opción para gatos exigentes que rechazan otras raciones." },
+  { nombre:"Prot", re:/^prot\b/i,
+    desc:"Prot es una ración estándar para perros y gatos adultos, con nutrición completa a un precio accesible. La presentación de 20 kg + 3 kg de regalo es una de las más elegidas para el día a día." },
+  { nombre:"Fámil Premium", re:/^f[áa]mil\b/i,
+    desc:"Fámil Premium es una ración premium para perros y gatos adultos de todas las razas, alimento completo y balanceado con kilo de regalo en la versión para gatos." },
+  { nombre:"Atacama", re:/^atacama\b/i,
+    desc:"Atacama es una ración premium con una línea para perros adultos y una fórmula específica para gatos castrados, pensada para controlar el peso y cuidar el tracto urinario después de la castración." },
+  { nombre:"Nhock", re:/^nhock\b/i,
+    desc:"Nhock Premium es una ración brasileña para perros adultos de todas las razas. Su combo de 25 kg + 10 kg de regalo es una de las mejores relaciones precio por kilo en ración premium." },
+  { nombre:"Oriunda", re:/^oriunda\b/i,
+    desc:"Oriunda es una ración estándar para perros adultos, con buen rendimiento y precio accesible, en bolsas de 7 kg y de 20 kg + 2 kg de regalo." },
+  { nombre:"Hiport Dog", re:/^hiport\b/i,
+    desc:"Hiport Dog es una ración para perros adultos de todas las razas, alimento completo y balanceado, en bolsas de 7 y 20 kg." },
+  { nombre:"Macanudo", re:/^macanudo\b/i,
+    desc:"Macanudo es una ración económica para perros y gatos adultos, en bolsas chicas de 5 y 7 kg, práctica para un solo animal." },
+  { nombre:"Simparica", re:/^simparica\b/i,
+    desc:"Simparica Trio es el antiparasitario mensual de Zoetis en comprimido masticable: protege contra pulgas, garrapatas, gusano del corazón y parásitos intestinales en una sola toma. Viene en cuatro presentaciones según el peso del perro, de 5 a 60 kg. Consultá con tu veterinario la dosis correcta." }
 ];
 
 /* ── 2. Utilidades ────────────────────────────────────────────────── */
@@ -204,6 +221,8 @@ ${o.body}
         ${Object.values(CATS).map(function(c){
           return `<li><a href="/catalogo/${c.slug}/">${c.label}</a></li>`;
         }).join("\n        ")}
+        <li><a href="/guias/">Guías y consejos</a></li>
+        <li><a href="/preguntas-frecuentes/">Preguntas frecuentes</a></li>
       </ul>
     </div>
     <div>
@@ -253,7 +272,7 @@ function breadcrumbLD(crumbs){
 function card(it){
   return `<li class="card">
         <a href="${it.url}">
-          <span class="card-art">${it.img ? `<img src="${it.img}" alt="${esc(it.titulo)}" loading="lazy" decoding="async">` : ""}</span>
+          <span class="card-art">${it.img ? `<img src="${it.img}" alt="${esc(it.titulo)} — ${esc(it.tipo)}" loading="lazy" decoding="async">` : ""}</span>
           <span class="card-cat">${esc(it.cat_label)}</span>
           <span class="card-name">${esc(it.name)}</span>
           ${it.pres ? `<span class="card-pres">${esc(it.pres)}</span>` : ""}
@@ -301,7 +320,7 @@ items.forEach(function(it){
   const body = `
 <article class="ficha wrap">
   <div class="ficha-art">
-    ${it.img ? `<img src="${it.img}" alt="${esc(it.titulo)} — La Barraquita, Minas" decoding="async">` : ""}
+    ${it.img ? `<img src="${it.img}" alt="${esc(it.titulo)}: ${esc(it.tipo).toLowerCase()} — La Barraquita, Minas" decoding="async">` : ""}
   </div>
   <div class="ficha-info">
     <p class="eyebrow"><a href="/catalogo/${it.cat_slug}/">${esc(it.cat_label)}</a>${it.marca ? ` · <a href="/marcas/${slug(it.marca)}/">${esc(it.marca)}</a>` : ""}</p>
@@ -330,6 +349,7 @@ items.forEach(function(it){
     <li>Te confirmamos stock, precio del día y forma de pago.</li>
     <li>Retirás en el local o coordinamos el envío con flota propia.</li>
   </ol>
+  <p><a class="link-mas" href="/preguntas-frecuentes/">Ver todas las preguntas frecuentes →</a></p>
 </section>
 
 ${relacionados.length ? `<section class="wrap bloque">
@@ -466,6 +486,7 @@ marcas.forEach(function(m){
 <section class="wrap encabezado">
   <p class="eyebrow">Marca</p>
   <h1 class="display">${esc(m.nombre)} en Minas y todo Uruguay</h1>
+  <p class="lead">${esc(m.desc)}</p>
   <p class="lead">Todas las presentaciones de <b>${esc(m.nombre)}</b> que tenemos en stock, con precio actualizado. ${cats.length === 1 ? "Línea de " + cats[0].toLowerCase() + "." : "Líneas de " + cats.join(" y ").toLowerCase() + "."} Comprala en La Barraquita, Intendente Lois 523, Minas (Lavalleja), con envío en el día a todo el país y venta por mayor y por menor.</p>
   <p class="conteo">${m.items.length} presentaciones disponibles</p>
 </section>
@@ -508,6 +529,137 @@ marcas.forEach(function(m){
   }));
 });
 
+/* ── 8b. Preguntas frecuentes (FAQPage) ───────────────────────────── */
+{
+  const crumbs = [ { n:"Inicio", u:"/" }, { n:"Preguntas frecuentes", u:"/preguntas-frecuentes/" } ];
+  const body = `
+<section class="wrap encabezado">
+  <p class="eyebrow">Ayuda</p>
+  <h1 class="display">Preguntas frecuentes</h1>
+  <p class="lead">Todo lo que nos preguntan sobre pedidos, envíos, pagos, venta por mayor y qué ración elegir. Si tu duda no está acá, escribinos por WhatsApp al <a href="${waHref("Hola La Barraquita! Tengo una consulta.")}" target="_blank" rel="noopener"><b>${TEL_WA}</b></a>.</p>
+</section>
+<section class="wrap bloque faq">
+  ${FAQ.map(function(f){
+    return `<details>
+    <summary><h2>${esc(f.q)}</h2></summary>
+    <p>${esc(f.a)}</p>
+  </details>`;
+  }).join("\n  ")}
+</section>
+<section class="wrap bloque">
+  <p><a class="link-mas" href="/catalogo/">Ver el catálogo completo →</a> &nbsp;·&nbsp; <a class="link-mas" href="/guias/">Guías y consejos →</a></p>
+</section>
+`;
+  write("preguntas-frecuentes/index.html", layout({
+    title: "Preguntas frecuentes: envíos, pagos y pedidos | La Barraquita",
+    ogTitle: "Preguntas frecuentes — La Barraquita",
+    desc: `Cómo pedir, envíos en el día a todo el Uruguay, formas de pago, venta por mayor, precios en dólares y qué ración elegir. La Barraquita, Minas, Lavalleja. WhatsApp ${TEL_WA}.`,
+    url: "/preguntas-frecuentes/",
+    crumbs: crumbs,
+    jsonld: { "@context":"https://schema.org", "@graph":[
+      {
+        "@type": "FAQPage",
+        "@id": SITE + "/preguntas-frecuentes/#faq",
+        "isPartOf": { "@id": SITE + "/#sitio" },
+        "about": NEGOCIO,
+        "mainEntity": FAQ.map(function(f){
+          return { "@type":"Question", "name": f.q, "acceptedAnswer": { "@type":"Answer", "text": f.a } };
+        })
+      },
+      breadcrumbLD(crumbs)
+    ] },
+    body: body
+  }));
+}
+
+/* ── 8c. Guías (Article) ──────────────────────────────────────────── */
+GUIAS.forEach(function(g){
+  const url = "/guias/" + g.slug + "/";
+  const crumbs = [ { n:"Inicio", u:"/" }, { n:"Guías", u:"/guias/" }, { n:g.titulo, u:url } ];
+  const otras = GUIAS.filter(function(o){ return o.slug !== g.slug; });
+  const body = `
+<article class="wrap guia">
+  <p class="eyebrow">Guía</p>
+  <h1 class="display">${esc(g.titulo)}</h1>
+  <p class="lead">${esc(g.desc)}</p>
+  <div class="guia-cuerpo">
+${g.cuerpo}
+  </div>
+  <p class="guia-cta">¿Te quedó alguna duda? Escribinos por WhatsApp al <a href="${waHref("Hola La Barraquita! Leí la guía «" + g.titulo + "» y tengo una consulta.")}" target="_blank" rel="noopener"><b>${TEL_WA}</b></a> y te asesoramos.</p>
+</article>
+${otras.length ? `<section class="wrap bloque">
+  <h2 class="display">Otras guías</h2>
+  <ul class="guia-lista">
+    ${otras.map(function(o){ return `<li><a href="/guias/${o.slug}/"><b>${esc(o.titulo)}</b><span>${esc(o.desc)}</span></a></li>`; }).join("\n    ")}
+  </ul>
+</section>` : ""}
+`;
+  write("guias/" + g.slug + "/index.html", layout({
+    title: `${g.titulo} | La Barraquita`,
+    ogTitle: g.titulo,
+    desc: g.desc,
+    url: url,
+    ogType: "article",
+    crumbs: crumbs,
+    jsonld: { "@context":"https://schema.org", "@graph":[
+      {
+        "@type": "Article",
+        "@id": SITE + url + "#articulo",
+        "headline": g.titulo,
+        "description": g.desc,
+        "inLanguage": "es-UY",
+        "datePublished": g.fecha,
+        "dateModified": HOY,
+        "author": NEGOCIO,
+        "publisher": NEGOCIO,
+        "image": SITE + "/img/og-cover.jpg",
+        "mainEntityOfPage": SITE + url,
+        "isPartOf": { "@id": SITE + "/#sitio" }
+      },
+      breadcrumbLD(crumbs)
+    ] },
+    body: body
+  }));
+});
+{
+  const crumbs = [ { n:"Inicio", u:"/" }, { n:"Guías", u:"/guias/" } ];
+  const body = `
+<section class="wrap encabezado">
+  <p class="eyebrow">Consejos</p>
+  <h1 class="display">Guías para alimentar bien a tus animales</h1>
+  <p class="lead">Lo que aprendimos en más de 20 años vendiendo raciones en Minas, explicado simple: cuánto darle, qué línea elegir, cómo alimentar a las gallinas y qué harina usar.</p>
+</section>
+<section class="wrap bloque">
+  <ul class="guia-lista">
+    ${GUIAS.map(function(g){ return `<li><a href="/guias/${g.slug}/"><b>${esc(g.titulo)}</b><span>${esc(g.desc)}</span></a></li>`; }).join("\n    ")}
+  </ul>
+</section>
+`;
+  write("guias/index.html", layout({
+    title: "Guías: cuánta ración dar, qué línea elegir y más | La Barraquita",
+    ogTitle: "Guías y consejos — La Barraquita",
+    desc: "Guías prácticas de La Barraquita: cuánta ración darle a un perro, qué línea elegir según edad y tamaño, cómo alimentar gallinas ponedoras y qué harina usar para cada preparación.",
+    url: "/guias/",
+    crumbs: crumbs,
+    jsonld: { "@context":"https://schema.org", "@graph":[
+      {
+        "@type": "CollectionPage",
+        "@id": SITE + "/guias/#pagina",
+        "name": "Guías y consejos de La Barraquita",
+        "isPartOf": { "@id": SITE + "/#sitio" },
+        "mainEntity": {
+          "@type": "ItemList",
+          "itemListElement": GUIAS.map(function(g, i){
+            return { "@type":"ListItem", "position": i + 1, "url": SITE + "/guias/" + g.slug + "/", "name": g.titulo };
+          })
+        }
+      },
+      breadcrumbLD(crumbs)
+    ] },
+    body: body
+  }));
+}
+
 /* ── 9. Sitemap ───────────────────────────────────────────────────── */
 {
   const urls = [
@@ -515,6 +667,9 @@ marcas.forEach(function(m){
     { loc:"/catalogo/", prio:"0.9", freq:"weekly" },
     ...Object.values(CATS).map(function(c){ return { loc:"/catalogo/" + c.slug + "/", prio:"0.8", freq:"weekly" }; }),
     ...marcas.map(function(m){ return { loc:m.url, prio:"0.7", freq:"weekly" }; }),
+    { loc:"/guias/", prio:"0.7", freq:"monthly" },
+    ...GUIAS.map(function(g){ return { loc:"/guias/" + g.slug + "/", prio:"0.7", freq:"monthly" }; }),
+    { loc:"/preguntas-frecuentes/", prio:"0.7", freq:"monthly" },
     ...items.map(function(it){ return { loc:it.url, prio:"0.6", freq:"weekly", img:it.img }; })
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -553,4 +708,5 @@ window.LB_CATS = ${JSON.stringify(cats)};
 console.log("Fichas de producto : " + items.length);
 console.log("Categorías         : " + Object.keys(CATS).length);
 console.log("Marcas             : " + marcas.length + " (" + marcas.map(function(m){ return m.nombre + "×" + m.items.length; }).join(", ") + ")");
-console.log("URLs en sitemap    : " + (2 + Object.keys(CATS).length + marcas.length + items.length));
+console.log("Guías              : " + GUIAS.length + " · FAQ: " + FAQ.length + " preguntas");
+console.log("URLs en sitemap    : " + (fs.readFileSync(path.join(ROOT, "sitemap.xml"), "utf8").match(/<url>/g) || []).length);
