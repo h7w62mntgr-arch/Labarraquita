@@ -42,6 +42,8 @@ body{
 }
 a{color:inherit;text-decoration:none}
 button{font:inherit;cursor:pointer}
+/* Texto solo para lectores de pantalla y buscadores (h1 del home) */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
 
 .wrap{max-width:1280px;margin:0 auto;padding:0 40px}
@@ -135,6 +137,17 @@ header.top{
 }
 .nav-group.open .submenu{display:flex}
 @media (hover:hover){ .nav-group:hover .submenu{display:flex} }
+/* Escritorio con mouse: el submenú no se cierra al bajar hacia él.
+   - ::after es un puente invisible que cubre el hueco de 6 px entre botón y menú.
+   - Se oculta con visibility + retardo (no con display) para perdonar salidas breves. */
+@media (hover:hover) and (min-width:861px){
+  .nav-group:hover::after{content:"";position:absolute;left:0;right:0;top:100%;height:20px}
+  .submenu{
+    display:flex;opacity:0;visibility:hidden;transform:translateY(-4px);
+    transition:opacity .15s,transform .15s,visibility 0s linear .3s;
+  }
+  .nav-group:hover .submenu,.nav-group.open .submenu{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+}
 .submenu button{background:none;border:none;font:inherit;text-align:left;padding:10px 18px;font-size:.92rem;font-weight:600;color:var(--body);white-space:nowrap;transition:background .12s,color .12s}
 .submenu button:hover{background:var(--bordo-tint);color:var(--bordo)}
 .submenu .sub-all{border-top:1px solid var(--line);margin-top:5px;padding-top:11px;color:var(--bordo)}
@@ -263,6 +276,7 @@ a.slide:focus-visible .slide-in{outline:3px solid var(--wa);outline-offset:-3px}
 .card-body{display:flex;flex-direction:column;gap:4px;padding:16px 16px 18px;flex:1}
 .card-cat{font-size:.69rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-deep)}
 .card h3{margin:1px 0 0;font-size:.98rem;line-height:1.25;font-weight:700;color:var(--ink)}
+.card h3 a{color:inherit}
 .card .pres{color:var(--ink-soft);font-size:.82rem}
 .card .gift{color:var(--bordo);font-size:.82rem;font-weight:600}
 .card-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:14px}
@@ -373,11 +387,12 @@ footer{margin-top:72px;background:var(--ink);color:#BFB3A6;border-top:3px solid 
 .foot-col h4.mt{margin-top:26px}
 .foot-line{margin:0;font-size:.9rem;line-height:1.6}
 .foot-links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
-.foot-links button{
-  background:none;border:0;padding:0;font:inherit;font-size:.92rem;font-weight:500;
+.foot-links button,.foot-links a{
+  display:block;background:none;border:0;padding:0;font:inherit;font-size:.92rem;font-weight:500;
   color:#D6CABD;text-align:left;transition:color .15s,padding-left .15s;
 }
-.foot-links button:hover{color:var(--gold);padding-left:4px}
+.foot-links button:hover,.foot-links a:hover{color:var(--gold);padding-left:4px}
+.foot-links .foot-all{margin-top:4px;font-weight:700;color:var(--gold)}
 .foot-wa{
   display:inline-flex;align-items:center;gap:9px;margin-top:16px;
   background:var(--wa);color:#fff;border-radius:10px;
@@ -461,6 +476,8 @@ footer{margin-top:72px;background:var(--ink);color:#BFB3A6;border-top:3px solid 
 .modal-actions .btn-checkout:hover{background:var(--bordo-hover)}
 .m-single{margin-top:14px;font-size:.86rem;color:var(--ink-soft);font-weight:600}
 .m-single:hover{color:var(--bordo);text-decoration:underline}
+.m-ficha{display:block;margin-top:6px;font-size:.86rem;color:var(--ink-soft);font-weight:600}
+.m-ficha:hover{color:var(--bordo);text-decoration:underline}
 
 /* Cajón del pedido */
 .drawer{

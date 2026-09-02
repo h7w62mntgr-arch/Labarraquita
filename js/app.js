@@ -128,6 +128,9 @@
   var byId = {};
   PRODUCTS.forEach(function(p){ byId[p.img] = p; });
 
+  /* URLs de las fichas estáticas (js/rutas.js, generado por tools/build-seo.mjs) */
+  var RUTAS = window.LB_RUTAS || {};
+
   function esc(s){
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
@@ -232,13 +235,15 @@
 
     grid.innerHTML = visible.map(function(p){
       var name = esc(p.name);
+      // El título enlaza a la ficha estática (SEO); el clic normal sigue abriendo el modal.
+      var url = RUTAS[p.id];
       return '<article class="card" data-id="' + p.img + '" tabindex="0" role="button" aria-label="Ver ' + name + '">' +
         '<div class="card-art">' + (p.flag ? '<span class="flag">' + p.flag + '</span>' : '') +
           (IMGS[p.img] ? '<img src="' + IMGS[p.img] + '" alt="' + name + '"' + (/sanitaria/i.test(p.name) ? ' class="litter"' : '') + ' loading="lazy">' : ICONS[p.cat]) +
         '</div>' +
         '<div class="card-body">' +
           '<span class="card-cat">' + catLabel[p.cat] + '</span>' +
-          '<h3>' + name + '</h3>' +
+          '<h3>' + (url ? '<a href="' + url + '" data-ficha>' + name + '</a>' : name) + '</h3>' +
           '<span class="pres">' + esc(p.pres) + '</span>' +
           (p.gift ? '<span class="gift">' + esc(p.gift) + '</span>' : '') +
           '<div class="card-foot">' +
@@ -423,7 +428,10 @@
     var footCats = document.querySelectorAll("[data-foot-cat]");
     for(var fi = 0; fi < footCats.length; fi++){
       (function(btn){
-        btn.addEventListener("click", function(){
+        btn.addEventListener("click", function(e){
+          // Son <a href> para que Google los rastree; un clic normal filtra sin recargar.
+          if(e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
+          e.preventDefault();
           applyNav(btn.getAttribute("data-foot-cat"), null, "");
         });
       })(footCats[fi]);
@@ -579,7 +587,8 @@
         '</div>' +
         '<button class="btn-checkout" data-madd aria-label="Agregar al pedido">Agregar al pedido</button>' +
       '</div>' +
-      '<a class="m-single" target="_blank" rel="noopener" href="' + waLink(p) + '">o pedir solo este por WhatsApp →</a>';
+      '<a class="m-single" target="_blank" rel="noopener" href="' + waLink(p) + '">o pedir solo este por WhatsApp →</a>' +
+      (RUTAS[p.id] ? '<a class="m-ficha" href="' + RUTAS[p.id] + '">Ver ficha completa para compartir →</a>' : '');
     openOverlay(modalOverlay);
   }
 
@@ -613,6 +622,12 @@
   grid.addEventListener("click", function(e){
     var add = e.target.closest("[data-add]");
     if(add){ addToCart(add.getAttribute("data-add"), 1); bump(); toast("Agregado a tu pedido ✓"); return; }
+    // El título es un enlace a la ficha: con Ctrl/⌘ se abre en otra pestaña, si no, el modal.
+    var ficha = e.target.closest("[data-ficha]");
+    if(ficha){
+      if(e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
+      e.preventDefault();
+    }
     var card = e.target.closest(".card[data-id]");
     if(card){ openModal(card.getAttribute("data-id")); }
   });

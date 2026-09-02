@@ -137,6 +137,7 @@
 </header>
 
 <div id="view-home">
+<h1 class="sr-only">Raciones balanceadas para perros, gatos y granja en Minas, Lavalleja — La Barraquita</h1>
 <section class="hero">
   <div class="wrap">
     <div class="hero-head">
@@ -273,13 +274,16 @@
 
     <div class="foot-col">
       <h4>Catálogo</h4>
+      <!-- Enlaces reales (rastreables por Google) a las páginas estáticas; el JS
+           los intercepta para filtrar el catálogo sin recargar. -->
       <ul class="foot-links">
-        <li><button type="button" data-foot-cat="perro">Perros</button></li>
-        <li><button type="button" data-foot-cat="gato">Gatos</button></li>
-        <li><button type="button" data-foot-cat="granja">Granja</button></li>
-        <li><button type="button" data-foot-cat="granos">Granos</button></li>
-        <li><button type="button" data-foot-cat="cuidado">Sanidad</button></li>
-        <li><button type="button" data-foot-cat="harina">Harinas</button></li>
+        <li><a href="/catalogo/perros/" data-foot-cat="perro">Perros</a></li>
+        <li><a href="/catalogo/gatos/" data-foot-cat="gato">Gatos</a></li>
+        <li><a href="/catalogo/granja/" data-foot-cat="granja">Granja</a></li>
+        <li><a href="/catalogo/granos/" data-foot-cat="granos">Granos</a></li>
+        <li><a href="/catalogo/sanidad/" data-foot-cat="cuidado">Sanidad</a></li>
+        <li><a href="/catalogo/harinas/" data-foot-cat="harina">Harinas</a></li>
+        <li><a href="/catalogo/" class="foot-all">Todos los productos con precio →</a></li>
       </ul>
     </div>
 
@@ -349,6 +353,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="js/rutas.js"></script>
 <script src="js/app.js"></script>
 
 </body>

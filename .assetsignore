@@ -20,3 +20,6 @@ img/*
 !img/brand-logo.png
 !img/caret.svg
 !img/og-cover.jpg
+
+# Generador de páginas SEO (solo se corre en local)
+tools
