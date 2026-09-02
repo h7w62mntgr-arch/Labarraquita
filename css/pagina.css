@@ -76,7 +76,8 @@ main{padding-bottom:40px}
 .ficha-art{background:var(--cream);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;align-items:center;justify-content:center;aspect-ratio:1/1}
 .ficha-art img{max-height:100%;object-fit:contain;width:auto}
 .ficha-info h1{font-size:clamp(1.8rem,3.4vw,2.5rem);margin:0 0 10px;color:var(--bordo-deep)}
-.ficha-pres{font-size:1.05rem;color:var(--body);margin:0 0 14px}
+.ficha-pres{font-size:1.05rem;color:var(--body);margin:0 0 10px}
+.ficha-desc{font-size:1rem;line-height:1.55;color:var(--body);margin:0 0 18px;max-width:520px}
 .ficha-precio{font-family:"Zilla Slab",Georgia,serif;font-size:2.2rem;font-weight:700;color:var(--bordo);margin:0 0 18px;line-height:1}
 .btn-wa{display:inline-flex;align-items:center;gap:10px;background:var(--wa);color:#fff;font-weight:800;padding:14px 24px;border-radius:12px;font-size:1.02rem;box-shadow:var(--shadow)}
 .btn-wa:hover{background:var(--wa-deep)}

@@ -14,6 +14,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import DESCRIPCIONES from "./descripciones.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://labarraquita.com.uy";
@@ -113,7 +114,8 @@ const items = PRODUCTS.map(function(p){
     img: IMGS[p.img] ? "/" + IMGS[p.img] : null,
     titulo: p.name + (p.pres ? " " + p.pres : ""),
     marca: marca ? marca.nombre : null,
-    precio: precio(p)
+    precio: precio(p),
+    desc: DESCRIPCIONES[p.id] || ""
   };
 });
 const porCat = {};
@@ -271,7 +273,7 @@ items.forEach(function(it){
   const pedido = `Hola La Barraquita! Quiero pedir: ${it.name}${it.pres ? " (" + it.pres + ")" : ""}. ¿Está disponible?`;
   const relacionados = porCat[it.cat].filter(function(o){ return o.id !== it.id; }).slice(0, 8);
 
-  const desc = `${it.name}${it.pres ? " de " + it.pres : ""} — ${it.precio} en La Barraquita, Minas (Lavalleja). ${it.tipo}. Envío en el día a todo el país, por mayor y por menor. Pedí por WhatsApp ${TEL_WA}.`;
+  const desc = `${it.name}${it.pres ? " de " + it.pres : ""} — ${it.precio} en La Barraquita, Minas (Lavalleja). ${it.desc || it.tipo + "."} Envío en el día a todo el país. WhatsApp ${TEL_WA}.`;
 
   const offer = {
     "@type": "Offer",
@@ -290,7 +292,7 @@ items.forEach(function(it){
     "name": it.titulo,
     "sku": it.id,
     "category": it.cat_label,
-    "description": `${it.tipo}${it.pres ? ", presentación de " + it.pres : ""}. Disponible en La Barraquita, Minas, Lavalleja, con envío a todo el Uruguay.`,
+    "description": `${it.desc || it.tipo + "."}${it.pres ? " Presentación de " + it.pres + "." : ""} Disponible en La Barraquita, Minas, Lavalleja, con envío a todo el Uruguay.`,
     "offers": offer
   };
   if(it.img) producto.image = SITE + it.img;
@@ -305,6 +307,7 @@ items.forEach(function(it){
     <p class="eyebrow"><a href="/catalogo/${it.cat_slug}/">${esc(it.cat_label)}</a>${it.marca ? ` · <a href="/marcas/${slug(it.marca)}/">${esc(it.marca)}</a>` : ""}</p>
     <h1 class="display">${esc(it.name)}</h1>
     ${it.pres ? `<p class="ficha-pres">Presentación: <b>${esc(it.pres)}</b></p>` : ""}
+    ${it.desc ? `<p class="ficha-desc">${esc(it.desc)}</p>` : ""}
     <p class="ficha-precio">${esc(it.precio)}</p>
     <a class="btn-wa" href="${waHref(pedido)}" target="_blank" rel="noopener">Pedir por WhatsApp ${TEL_WA}</a>
     <p class="ficha-nota">Coordinás pago y entrega directo por WhatsApp. El precio es de referencia: confirmá stock y valor al hacer el pedido.</p>

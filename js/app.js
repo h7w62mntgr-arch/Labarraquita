@@ -619,20 +619,23 @@
     }
   });
 
+  /* Tocar una tarjeta lleva directo a la ficha del producto (página estática).
+     Si no existe ruta (js/rutas.js sin generar), se abre la vista previa como antes. */
+  function abrirProducto(id){
+    var p = byId[id];
+    var url = p && RUTAS[p.id];
+    if(url){ location.href = url; } else { openModal(id); }
+  }
   grid.addEventListener("click", function(e){
     var add = e.target.closest("[data-add]");
     if(add){ addToCart(add.getAttribute("data-add"), 1); bump(); toast("Agregado a tu pedido ✓"); return; }
-    // El título es un enlace a la ficha: con Ctrl/⌘ se abre en otra pestaña, si no, el modal.
-    var ficha = e.target.closest("[data-ficha]");
-    if(ficha){
-      if(e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
-      e.preventDefault();
-    }
+    // El título ya es un <a href> a la ficha: dejamos que el navegador lo siga.
+    if(e.target.closest("[data-ficha]")) return;
     var card = e.target.closest(".card[data-id]");
-    if(card){ openModal(card.getAttribute("data-id")); }
+    if(card){ abrirProducto(card.getAttribute("data-id")); }
   });
   grid.addEventListener("keydown", function(e){
-    if(e.key === "Enter" && e.target.classList.contains("card")){ openModal(e.target.getAttribute("data-id")); }
+    if(e.key === "Enter" && e.target.classList.contains("card")){ abrirProducto(e.target.getAttribute("data-id")); }
   });
 
   var pagerRt;
